@@ -1,0 +1,63 @@
+name: VIRP2 Build/deploy to SQA2
+on:
+  push:
+    branches:
+      - a
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - 'web81'
+
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ssh-strict: true
+          persist-credentials: false
+          lfs: false
+      - name: Fetch LFS
+        run: |
+          git lfs fetch origin refs/remotes/origin/dhb_actions
+          git lfs checkout
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - name: Backup the the running service and web-site (virp2)
+        run: |
+          $DateTime = (Get-Date).ToString('yyyyMMdd.hhmm')
+          Compress-Archive -Path \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_SERVICE2, \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_WEB2 -DestinationPath "D:\Deployment Files\Backup\inetpub\vaauscreweb50\$DateTime.2.zip"
+      - name: Clear the running service and web-site (virp2)
+        run: |
+          # Remove-Item \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_SERVICE2\*.*
+          # Remove-Item \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_SERVICE2\Bin\*.*
+          # Remove-Item \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_SERVICE2\Config\*.*
+          # Remove-Item \\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot\VIRP_WEB2\* -Recurse -Exclude Thumbs.db
+      - name: Build app for release
+        run: |
+          mode con: lines=32766
+          $Env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
+          $Env:Path += ";C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin"
+          $env:path -split ";"
+          cd "Registries VIRP Service"
+          # this is a comment
+          MSBuild VIRP_SERVICE.csproj /p:DeployOnBuild=true /p:Configuration=Staging2 /p:PublishProfile=VIRP_SERVICE_SQA2
+          cd ..\"Registries VIRP Web Site"
+          MSBuild VIRP_WEB.csproj /p:DeployOnBuild=true /p:Configuration=Staging2 /p:PublishProfile=VIRP_WEB_SQA2
+          
+      - name: Fortify scan
+        run: |
+          mode con: lines=32766
+          $Env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
+          $Env:Path += ";C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin"
+          $env:path -split ";" 
+          sourceanalyzer -b VIRP_SOLN -clean
+          sourceanalyzer -b VIRP_SOLN -Xmx8G -Xss800M devenv "VIRP_SOLN.sln" /Rebuild Debug
+          sourceanalyzer -b VIRP_SOLN -Xmx8G -Xss800M -scan -f "VIRP_SOLN.fpr"
+      - run: echo "🍏 This job's status is ${{ job.status }}."
