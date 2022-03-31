@@ -21,7 +21,12 @@ on:
       environment:
         description: 'Environment to run tests against'
         type: environment
-        required: true 
+        required: true
+        options:
+        - dev
+        - dev2
+        - sqa
+        - sqa2
 
 jobs:
   print-tag:
