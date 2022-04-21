@@ -30,7 +30,7 @@ jobs:
     
   DeployStaging:
     name: Deploy to Staging 
-    if: github.event.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request' && github.event.ref == 'refs/heads/main'
     needs: [Build]
     runs-on: ubuntu-latest
     environment: 
@@ -42,6 +42,7 @@ jobs:
             
   DeployProd:
     name: Deploy to Production 
+    if: github.event_name == 'pull_request' && github.event.ref == 'refs/heads/main'
     needs: [DeployStaging]
     runs-on: ubuntu-latest
     environment: 
