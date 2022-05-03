@@ -10,11 +10,18 @@ on:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
+      output2: ${{ steps.step2.outputs.test }}    
     steps:
       - uses: actions/checkout@v2
 
       - name: Compile
         run: echo Hello, world!
+      - id: step1
+        run: echo "::set-output name=test::hello"
+      - id: step2
+        run: echo "::set-output name=test::world"        
     
   DeployDev:
     name: Deploy to Dev 
@@ -24,6 +31,7 @@ jobs:
       name: Development
       url: 'http://dev.myapp.com'
     steps:
+      - run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
       - name: Deploy
         run: echo I am deploying! I would like this to run automatically with build.
     
@@ -36,6 +44,7 @@ jobs:
       name: Staging
       url: 'http://test.myapp.com'
     steps:
+      - run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
       - name: Deploy
         run: echo I am deploying! 
             
@@ -48,5 +57,6 @@ jobs:
       name: Production
       url: 'http://www.myapp.com'
     steps:
+      - run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
       - name: Deploy
         run: echo I am deploying! 
