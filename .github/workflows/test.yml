@@ -15,7 +15,7 @@ on:
         - sqa
         - sqa2
       print_tags:
-        description: 'True to print to STDOUT'
+        description: 'True to print to STDOUT ss'
         required: true 
         type: boolean 
       tags:
