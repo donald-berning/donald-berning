@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Deploy
         run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
-        run: echo I am deploying! I would like this to run automatically with build.
+      - run: echo I am deploying! I would like this to run automatically with build.
     
   DeployStaging:
     name: Deploy to Staging 
@@ -46,7 +46,7 @@ jobs:
     steps:
       - name: Deploy
         run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
-        run: echo I am deploying! 
+      - run: echo I am deploying! 
             
   DeployProd:
     name: Deploy to Production 
@@ -58,5 +58,5 @@ jobs:
       url: 'http://www.myapp.com'
     steps:
       - name: Deploy
-      - run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
-        run: echo I am deploying! 
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
+      - run: echo I am deploying! 
