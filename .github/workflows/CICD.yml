@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       output1: ${{ steps.step1.outputs.test }}
-      output2: ${{ steps.step2.outputs.test }}    
+      output2: ${{ steps.step2.outputs.test }} 
+      outDateTimeBuild: ${{steps.zip.outputs.$DateTimeBuild}}   
     steps:
       - uses: actions/checkout@v2
 
@@ -21,7 +22,13 @@ jobs:
       - id: step1
         run: echo "::set-output name=test::hello"
       - id: step2
-        run: echo "::set-output name=test::world"        
+        run: echo "::set-output name=test::world"
+      - name: Zip
+        run: |
+          $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.hhmm')
+          # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
+
+
     
   DeployDev:
     name: Deploy to Dev 
@@ -32,7 +39,7 @@ jobs:
       url: 'http://dev.myapp.com'
     steps:
       - name: Deploy
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} ${{needs.Build.outputs.outDateTimeBuild}}
       - run: echo I am deploying! I would like this to run automatically with build.
     
   DeployStaging:
