@@ -28,6 +28,7 @@ jobs:
           $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.hhmm')
           # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
+          echo $DateTimeBuild
 
 
     
@@ -40,7 +41,7 @@ jobs:
       url: 'http://dev.myapp.com'
     steps:
       - name: Deploy
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} ${{needs.Build.outputs.outDateTimeBuild}}
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}
       - run: echo I am deploying! I would like this to run automatically with build.
     
   DeployStaging:
