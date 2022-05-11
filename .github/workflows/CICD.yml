@@ -32,6 +32,8 @@ jobs:
       - run: echo ---$DateTimeBuild---  ---${{ env.datetimebuild }}---
       - id: Zip
         run: |
+          $env:b = ${{ github.run_number }}
+          echo github.run_number ${{ github.run_number }}
           # $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
           $DateTimeBuild = ${{ env.datetimebuild }}
           # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
@@ -50,11 +52,13 @@ jobs:
     steps:
       - name: Deploy
         run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}
+      - run: echo github.run_number ${{ github.run_number }}
       - run: echo I am deploying! I would like this to run automatically with build.
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
       - run: echo Will we have an issue with blanks around the datetime stamp?
 
       - name: Deploy2
+        # ${{ env.datetimebuild }} is undefined in later jobs, grrr.
         run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}} or ${{ env.datetimebuild }}
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{ env.datetimebuild }}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
 
@@ -69,7 +73,7 @@ jobs:
       url: 'http://test.myapp.com'
     steps:
       - name: Deploy
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} ${{needs.Build.outputs.outDateTimeBuild}} github.run_number ${{ github.run_number }}   
       - run: echo I am deploying! 
             
   DeployProd:
@@ -82,5 +86,5 @@ jobs:
       url: 'http://www.myapp.com'
     steps:
       - name: Deploy
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}}    
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} ${{needs.Build.outputs.outDateTimeBuild}} github.run_number ${{ github.run_number }}       
       - run: echo I am deploying! 
