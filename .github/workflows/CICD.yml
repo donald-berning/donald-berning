@@ -79,7 +79,7 @@ jobs:
   DeployProd:
     name: Deploy to Production 
     if: github.event_name == 'pull_request'
-    needs: [DeployStaging]
+    needs: [Build, DeployStaging]  # needs: has to refer back to Build to use its outputs!
     runs-on: ubuntu-latest
     environment: 
       name: Production
