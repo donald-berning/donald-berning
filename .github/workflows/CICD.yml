@@ -53,7 +53,12 @@ jobs:
       - run: echo I am deploying! I would like this to run automatically with build.
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
       - run: echo Will we have an issue with blanks around the datetime stamp?
-    
+
+      - name: Deploy2
+        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}} or ${{ env.datetimebuild }}
+      - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{ env.datetimebuild }}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
+
+
   DeployStaging:
     name: Deploy to Staging 
     if: github.event_name == 'pull_request'
