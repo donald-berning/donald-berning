@@ -26,13 +26,16 @@ jobs:
         run: echo "::set-output name=test::hello"
       - id: step2
         run: echo "::set-output name=test::world"
-      - run: $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
+      - run: |
+          $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
+          echo ---$DateTimeBuild---  ---${{ env.datetimebuild }}---
+      - run: echo ---$DateTimeBuild---  ---${{ env.datetimebuild }}---
       - id: Zip
         run: |
           # $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
           # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-          echo -->$DateTimeBuild<--  -->${{ env.datetimebuild }}<--
+          echo ---$DateTimeBuild---  ---${{ env.datetimebuild }}---
 
 
     
