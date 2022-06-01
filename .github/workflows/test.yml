@@ -7,7 +7,7 @@ on:
 jobs:
   testReusable:
     uses:
-      donald-berning/donald-berning/.github/workflows/testReusable.yml@v1
+      donald-berning/donald-berning/.github/workflows/testReusable.yml@v2
     with:
       pass_something: $GITHUB_RUN_NUMBER
 #    secrets: inherit  trivial push
