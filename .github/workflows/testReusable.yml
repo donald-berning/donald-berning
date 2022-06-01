@@ -5,11 +5,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - run: echo Hello, world!
-#  testReusable:
-#    uses:
-#      EPMO/virp-web-site/.github/workflows/testReusable.yml
-#    with:
-#      pass_something: $GITHUB_RUN_NUMBER
+  testReusable:
+    uses:
+      EPMO/virp-web-site/.github/workflows/testReusable.yml
+    with:
+      pass_something: $GITHUB_RUN_NUMBER
 #    secrets: inherit
 #        PERSONAL_ACCESS_TOKEN: ${{secrets.PERSONAL_ACCESS_TOKEN}}
 
