@@ -10,5 +10,5 @@ jobs:
       donald-berning/donald-berning/.github/workflows/testReusable.yml@v1
     with:
       pass_something: $GITHUB_RUN_NUMBER
-#    secrets: inherit
+#    secrets: inherit  trivial push
 #       PERSONAL_ACCESS_TOKEN: ${{secrets.PERSONAL_ACCESS_TOKEN}}
