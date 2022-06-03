@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
-  b: ${{ github.run_number }} + 216
+  DateTimeBuild: ${{ (Get-Date).ToString('yyyyMMdd.HHmm') }}
+  b: ${{ github.run_number +216 }}
 
 jobs:
   Preamble:
@@ -18,7 +18,7 @@ jobs:
       - name: Build app for release to virp $env:b
         run: |
 
-          echo "Build number $env:b"
+          echo "Build number $env:b  DateTimeBuild $env.DateTimeBuild ."
 
 
       - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }} and b = ${{ env.b }}."  
