@@ -22,7 +22,8 @@ jobs:
           echo "Build number $env:b"
 
 
-      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."  Build:
+      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."  
+  Build:
     runs-on: windows-latest
     outputs:
       output1: ${{ steps.step1.outputs.test }}
