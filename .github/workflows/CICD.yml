@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
 
 env:
-  DateTimeBuild: ${{ (Get-Date).ToString('yyyyMMdd.HHmm') }}
-  b: ${{ github.run_number +216 }}
+  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
+  b: ${{ github.run_number }} + 216
 
 jobs:
   Preamble:
