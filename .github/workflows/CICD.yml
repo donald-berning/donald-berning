@@ -17,11 +17,13 @@ jobs:
     steps:
       - name: Build app for release to virp $env:b
         run: |
-
           echo "Build number $env:b  DateTimeBuild $env.DateTimeBuild ."
-
-
-      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }} and b = ${{ env.b }}."  
+      - run: echo "triggered by a ${{ github.event_name }} event"
+      - run: echo "for branch ${{ github.ref }} in ${{ github.repository }}"
+      - run: echo "for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }} and b = ${{ env.b }}."  
+      - run: |
+          $env:b = ${{ env.b }}
+          echo " env b= $env.b"
   Build:
     runs-on: windows-latest
     outputs:
