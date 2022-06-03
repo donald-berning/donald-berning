@@ -9,9 +9,20 @@ on:
 
 env:
   DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
+  b: ${{ github.run_number }} + 216
 
 jobs:
-  Build:
+  Preamble:
+    runs-on: windows-latest
+    steps:
+      - name: Build app for release to virp $env:b
+        run: |
+
+          $env:b = ${{ github.run_number }} + 216
+          echo "Build number $env:b"
+
+
+      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."  Build:
     runs-on: windows-latest
     outputs:
       output1: ${{ steps.step1.outputs.test }}
