@@ -41,7 +41,7 @@ jobs:
         run: echo "::set-output name=test::world"
       - run: |
           $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---"
+          # echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---"
       # - run: echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---  build number $env.b = ${{$env.b}}"
       - id: Zip
         run: |
