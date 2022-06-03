@@ -18,11 +18,10 @@ jobs:
       - name: Build app for release to virp $env:b
         run: |
 
-          $env:b = ${{ github.run_number }} + 216
           echo "Build number $env:b"
 
 
-      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."  
+      - run: echo "triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }} and b = ${{ env.b }}."  
   Build:
     runs-on: windows-latest
     outputs:
@@ -64,7 +63,7 @@ jobs:
     steps:
       - name: Deploy
         run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}
-      - run: echo github.run_number ${{ github.run_number }}
+      - run: echo "github.run_number ${{ github.run_number }}  build number ${{ env.b }}  DateTimeBuild  ${{ env.DateTimeBuild }}"
       - run: echo I am deploying! I would like this to run automatically with build.
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
       - run: echo Will we have an issue with blanks around the datetime stamp?
