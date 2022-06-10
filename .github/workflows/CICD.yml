@@ -33,25 +33,17 @@ jobs:
     needs: Preamble
     runs-on: windows-latest
     outputs:
-      output1: ${{ steps.step1.outputs.test }}
-      output2: ${{ steps.step2.outputs.test }} 
       outDateTimeBuild: ${{steps.zip.outputs.outDateTimeBuild}}   
     steps:
       - run: echo "b= ${{needs.Preamble.outputs.b}}"
       - uses: actions/checkout@v2
       - run: dir
-      - run: echo "github.workspace ${{github.workspace}}
-      - id: step1
-        run: echo "::set-output name=test::hello"
-      - id: step2
-        run: echo "::set-output name=test::world"
+      - run: echo "github.workspace ${{github.workspace}}"
       - id: Zip
         run: |
           $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
           echo "github.run_number ${{ github.run_number }} and Build number $env:b"
-          # $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
           $DateTimeBuild = ${{ env.datetimebuild }}
-          # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
           echo "---$DateTimeBuild---  ---${{ env.datetimebuild }}---"
 
@@ -67,7 +59,7 @@ jobs:
     steps:
       - run: echo "github.workspace ${{github.workspace}}
       - name: Deploy
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}
+        run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}"
       - run: echo "github.run_number ${{ github.run_number }}  build number ${{ env.b }}  DateTimeBuild  ${{ env.DateTimeBuild }}"
       - run: echo I am deploying! I would like this to run automatically with build.
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
@@ -75,9 +67,7 @@ jobs:
 
       - name: Deploy2
         # ${{ env.datetimebuild }} is undefined in later jobs, grrr.
-        run: echo ${{needs.Build.outputs.output1}} ${{needs.Build.outputs.output2}} datetimebuild ${{needs.Build.outputs.outDateTimeBuild}} or ${{ env.datetimebuild }}
-      - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{ env.datetimebuild }}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
-
+        run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}} or ${{ env.datetimebuild }}"
 
   DeployStaging:
     name: Deploy to Staging 
