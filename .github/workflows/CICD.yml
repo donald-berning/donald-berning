@@ -26,9 +26,9 @@ jobs:
           echo "::set-output name=b::$b"
           $DateTimeBuild = ${{ env.datetimebuild }}
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-      - run: echo "RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
-      - run: $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
-      - run: echo "Current $DT DateTimeBuild= $env:DateTimeBuild"
+          echo "RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "Current $DT DateTimeBuild= $env:DateTimeBuild"
 
   Build:
     # if: false #skips the step (or job)
@@ -48,8 +48,8 @@ jobs:
           $DateTimeBuild = ${{ env.datetimebuild }}
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
           echo "---$DateTimeBuild---  ---${{ env.datetimebuild }}---"
-      - run: $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
-      - run: echo "Current $DT DateTimeBuild= $DateTimeBuild"
+          $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
+          echo "Current $DT DateTimeBuild= $DateTimeBuild"
     
   DeployDev:
     name: Deploy to Dev 
@@ -63,9 +63,10 @@ jobs:
       - name: Deploy
         run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}"
       - run: echo "github.run_number ${{ github.run_number }}  build number ${{ env.b }}  DateTimeBuild  ${{ env.DateTimeBuild }}"
-      - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
-      - run: $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
-      - run: echo "Current $DT DateTimeBuild= ${{needs.Build.outputs.outDateTimeBuild}} "
+      - run: |
+          echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
+          $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
+          echo "Current $DT DateTimeBuild= ${{needs.Build.outputs.outDateTimeBuild}} "
 
       - name: Deploy2
         # ${{ env.datetimebuild }} is undefined in later jobs, grrr.
