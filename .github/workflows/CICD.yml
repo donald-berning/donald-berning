@@ -51,13 +51,13 @@ jobs:
       # - run: echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---  build number $env.b = ${{$env.b}}"
       - id: Zip
         run: |
-          $env:b = ${{ github.run_number }}
-          echo github.run_number ${{ github.run_number }}
+          $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
+          echo "github.run_number ${{ github.run_number }} and Build number $env:b"
           # $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
           $DateTimeBuild = ${{ env.datetimebuild }}
           # Compress-Archive -Path \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, \\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB -DestinationPath "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip"
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-          echo ---$DateTimeBuild---  ---${{ env.datetimebuild }}---
+          echo "---$DateTimeBuild---  ---${{ env.datetimebuild }}---"
 
 
     
