@@ -21,7 +21,7 @@ jobs:
           echo "Build number $env:b  DateTimeBuild $env.DateTimeBuild ."
       - run: echo "triggered by a ${{ github.event_name }} event"
       - run: echo "for branch ${{ github.ref }} in ${{ github.repository }}"
-      - run: echo "for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }} and b = ${{ env.b }}."  
+      - run: echo "for GITHUB.RUN_NUMBER = ${{ github.run_number }} and b = ${{ env.b }}."  
       - run: |
           echo " env b= $env.b --- ${{env.b}}"
           $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
