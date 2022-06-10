@@ -21,7 +21,7 @@ jobs:
       - run: echo "Current (Get-Date).ToString('yyyyMMdd.HHmmss') DateTimeBuild= $env:DateTimeBuild "
       - id: Zip
         run: |
-          b = ${{ github.run_number }} + ${{ env.bOffset }}
+          $b = ${{ github.run_number }} + ${{ env.bOffset }}
           echo "::set-output name=b::$b"
           $DateTimeBuild = ${{ env.datetimebuild }}
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"          
