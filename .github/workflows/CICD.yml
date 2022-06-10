@@ -16,39 +16,30 @@ jobs:
   Preamble:
     runs-on: windows-latest
     steps:
-      - name: Build app for release to virp $env:b
+      - run: echo "B= $env:b bOffset= $env:bOffset ${{ github.event_name }} DateTimeBuild= $env:DateTimeBuild  ${{ github.ref }} in ${{ github.repository }}."
+      - run: echo "RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number ${{ env.b }} + ${{env.bOffset }}."  
+      - run: echo "Current (Get-Date).ToString('yyyyMMdd.HHmmss') DateTimeBuild= $env:DateTimeBuild "
+      - id: Zip
         run: |
-          echo "Build number $env:b  DateTimeBuild $env.DateTimeBuild ."
-      - run: echo "triggered by a ${{ github.event_name }} event"
-      - run: echo "for branch ${{ github.ref }} in ${{ github.repository }}"
-      - run: echo "for GITHUB.RUN_NUMBER = ${{ github.run_number }} and b = ${{ env.b }}."  
-      - run: |
-          echo " env b= $env:b --- ${{env.b}}"
-          $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
-          echo "Build number $env:b"
-          echo " env b= $env:b --- ${{env.b}}"
-          echo " env b= $env:b"
-          
+          b = ${{ github.run_number }} + ${{ env.bOffset }}
+          echo "::set-output name=b::$b"
+          $DateTimeBuild = ${{ env.datetimebuild }}
+          echo "::set-output name=outDateTimeBuild::$DateTimeBuild"          
   Build:
     # if: false #skips the step (or job)
+    needs: Preamble
     runs-on: windows-latest
     outputs:
       output1: ${{ steps.step1.outputs.test }}
       output2: ${{ steps.step2.outputs.test }} 
       outDateTimeBuild: ${{steps.zip.outputs.outDateTimeBuild}}   
     steps:
+      - run: echo "b= ${{needs.Preamble.outputs.b}}"
       - uses: actions/checkout@v2
-
-      - name: Compile
-        run: echo Hello, world!
       - id: step1
         run: echo "::set-output name=test::hello"
       - id: step2
         run: echo "::set-output name=test::world"
-      # - run: |
-      #    $DateTimeBuild = (Get-Date).ToString('yyyyMMdd.HHmm')
-      #    # echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---"
-      # - run: echo "---$DateTimeBuild---  ---${{ $env.datetimebuild }}---  build number $env.b = ${{$env.b}}"
       - id: Zip
         run: |
           $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
