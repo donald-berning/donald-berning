@@ -30,7 +30,7 @@ jobs:
           echo " env b= $env:b"
           
   Build:
-    if: false #skips the step (or job)
+    # if: false #skips the step (or job)
     runs-on: windows-latest
     outputs:
       output1: ${{ steps.step1.outputs.test }}
