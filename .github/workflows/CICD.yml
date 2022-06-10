@@ -52,12 +52,12 @@ jobs:
   DeployDev:
     name: Deploy to Dev 
     needs: [Build]
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     environment: 
       name: Development
       url: 'http://dev.myapp.com'
     steps:
-      - run: echo "github.workspace ${{github.workspace}}
+      - run: echo "github.workspace ${{github.workspace}}"
       - name: Deploy
         run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}"
       - run: echo "github.run_number ${{ github.run_number }}  build number ${{ env.b }}  DateTimeBuild  ${{ env.DateTimeBuild }}"
