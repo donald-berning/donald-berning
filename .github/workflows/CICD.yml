@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
+  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmmss')
   b: ${{ github.run_number }}
   bOffset: 216
 
