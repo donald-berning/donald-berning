@@ -27,7 +27,6 @@ jobs:
           $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
           echo "Build number $env:b"
           echo " env b= $env.b --- ${{env.b}}"
-          env:b = ${{ env.b }}
           echo " env b= $env.b"
           
   Build:
