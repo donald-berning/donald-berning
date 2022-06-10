@@ -21,7 +21,8 @@ jobs:
     steps:
       - run: echo "B= $env:b bOffset= $env:bOffset ${{ github.event_name }} DateTimeBuild= $env:DateTimeBuild  ${{ github.ref }} in ${{ github.repository }}."
       - run: echo "RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number ${{ ${{ env.b }} + ${{env.bOffset }} }}."  
-      - run: echo "Current ${{(Get-Date).ToString('yyyyMMdd.HHmmss')}} DateTimeBuild= ${{env:DateTimeBuild}} "
+      - run: $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')
+      - run: echo "Current ${{$DT}} DateTimeBuild= ${{env:DateTimeBuild}} "
       - id: Zip
         run: |
           $b = ${{ github.run_number }} + ${{ env.bOffset }}
@@ -46,7 +47,8 @@ jobs:
           $DateTimeBuild = ${{ env.datetimebuild }}
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
           echo "---$DateTimeBuild---  ---${{ env.datetimebuild }}---"
-      - run: echo "Current ${{(Get-Date).ToString('yyyyMMdd.HHmmss')}} DateTimeBuild= ${{$DateTimeBuild}} "
+      - run: $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
+      - run: echo "Current ${{$DT}} DateTimeBuild= ${{$DateTimeBuild}} "
 
 
     
@@ -63,8 +65,9 @@ jobs:
         run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}}"
       - run: echo "github.run_number ${{ github.run_number }}  build number ${{ env.b }}  DateTimeBuild  ${{ env.DateTimeBuild }}"
       - run: echo Expand-Archive -Path "\\VAAUSCREWEB80.aac.dva.va.gov\DeploymentFiles\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "\\VAAUSCREWEB50.aac.dva.va.gov\d$\inetpub\wwwroot"
-      - run: echo "Current ${{(Get-Date).ToString('yyyyMMdd.HHmmss')}} DateTimeBuild= ${{needs.Build.outputs.outDateTimeBuild}} "
-
+      - run: $DT=(Get-Date).ToString('yyyyMMdd.HHmmss')      
+      - run: echo "Current ${{$DT}} DateTimeBuild= ${{needs.Build.outputs.outDateTimeBuild}} "
+      
       - name: Deploy2
         # ${{ env.datetimebuild }} is undefined in later jobs, grrr.
         run: echo "datetimebuild ${{needs.Build.outputs.outDateTimeBuild}} or ${{ env.datetimebuild }}"
