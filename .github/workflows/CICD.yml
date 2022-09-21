@@ -26,7 +26,7 @@ jobs:
           echo "::set-output name=b::$b"
           $DateTimeBuild = ${{ env.datetimebuild }}
           echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-          echo "RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
+          echo " RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "Current $DT DateTimeBuild= $env:DateTimeBuild"
 
