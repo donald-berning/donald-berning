@@ -34,16 +34,16 @@ jobs:
     runs-on: windows-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."
-      if: false #skips the step (or job)
       - name: Check out repository code
+      if: false #skips the step (or job)
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ssh-strict: true
           persist-credentials: true
           lfs: false
-      if: false #skips the step (or job)
       - name: Fetch LFS
+      if: false #skips the step (or job)
         run: |
           git lfs fetch origin head
           git lfs checkout
