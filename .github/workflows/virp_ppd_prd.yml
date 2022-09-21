@@ -95,7 +95,7 @@ jobs:
           $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
           echo $DateTime start Fortify copy
       - name: Archive the .fpr file
-      - run: Copy-Item -path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\${{needs.Build.outputs.outDateTimeBuild}}.fpr"
+        run: Copy-Item -path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\${{needs.Build.outputs.outDateTimeBuild}}.fpr"
       - run: echo "-path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\${{needs.Build.outputs.outDateTimeBuild}}.fpr""
 
   Backup800:
