@@ -69,7 +69,7 @@ jobs:
         if: false #skips the step (or job)
         run: |
           Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip"
-      - run: echo Deployment folder:  \\VAAUSWEBCRE801.aac.dva.va.gov\d$\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip  for build ${{ github.run_number }}
+      - run: echo "-DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip""
 
   Fortify:
     runs-on: windows-latest
