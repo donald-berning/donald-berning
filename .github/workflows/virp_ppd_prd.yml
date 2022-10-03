@@ -3,36 +3,30 @@ on:
   push:
     branches:
       - dhb800
-env:
-  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
-  bOffset: 252
 jobs:
   Preamble:
     runs-on: windows-latest
     outputs:
       b: ${{ steps.zip.outputs.b }}
-      outDateTimeBuild: ${{steps.zip.outputs.outDateTimeBuild}}  
+      DTB: ${{steps.zip.outputs.DTB}}  
     steps:
-      - run: echo "B= $env:b bOffset= $env:bOffset ${{ github.event_name }} DateTimeBuild= $env:DateTimeBuild  ${{ github.ref }} in ${{ github.repository }}."
       - id: Zip
         run: |
-          $b = ${{ github.run_number }} + ${{ env.bOffset }}
+          $b = ${{ github.run_number }} + 252  # bOffset
           echo "::set-output name=b::$b"
-          $DateTimeBuild = ${{ env.datetimebuild }}
-          echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-          echo " RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
-          echo "Current $DT DateTimeBuild= $env:DateTimeBuild"
+          echo "::set-output name=DTB::$DT"
+          echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b."
 
   Build:
     # if: false #skips the step (or job)
     needs: Preamble
     runs-on: windows-latest
     steps:
-      - run: echo "outDateTimeBuild=${{needs.Preamble.outputs.outDateTimeBuild}}...    b=${{needs.Preamble.outputs.b}}..."
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."
+      - run: $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+      - run: echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
       - id: Zip
         if: false #skips the step (or job)
         run: |
-          Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.outDateTimeBuild}}.deploy.zip"
-      - run: echo "-DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.outDateTimeBuild}}-${{needs.Preamble.outputs.b}}.deploy.zip""
+          Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.B}}.deploy.zip"
+      - run: echo "-DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""
