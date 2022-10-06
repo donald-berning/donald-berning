@@ -45,5 +45,5 @@ jobs:
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..."
           $DTE = $DT - $DTB
           echo "elapsed = $DTE"
-          $DTE = ($DTE).ToString('HHmmss')
+          $DTE = ($DTE).ToString('yyyyMMdd.HHmmss')
           echo "elapsed = $DTE"
