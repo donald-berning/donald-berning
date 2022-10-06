@@ -30,7 +30,7 @@ jobs:
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
       - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
       - id: Zip
-        # if: false #skips the step (or job)
+        if: false #skips the step (or job)
         run: |
           echo "Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
           Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip"
