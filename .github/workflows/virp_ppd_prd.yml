@@ -34,4 +34,8 @@ jobs:
         run: |
           echo "Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
           Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip"
-      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip"""
+      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""
+  Summary:
+    runs-on: windows-latest
+    steps:
+      - run: echo $GITHUB_STEP_SUMMARY
