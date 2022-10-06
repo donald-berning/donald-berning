@@ -16,7 +16,6 @@ jobs:
           echo "::set-output name=b::$b"
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "::set-output name=DTB::$DT"
-          echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b."
           echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b." >> $GITHUB_STEP_SUMMARY
 
   Build:
@@ -26,7 +25,6 @@ jobs:
     steps:
       - run: |
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
-          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
       - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
       - id: Zip
@@ -34,9 +32,15 @@ jobs:
         run: |
           echo "Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
           Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip"
-      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip"""
+      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
   Summary:
     needs: [Preamble, Build]
     runs-on: windows-latest
     steps:
       - run: echo $GITHUB_STEP_SUMMARY
+      - run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          $DTB = ${{needs.Preamble.outputs.DTB}}
+          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
+          $DTE = $DTB - $DT
+          echo "elapsed = $DTE"
