@@ -24,6 +24,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - run: |
+          echo "current = (Get-Date).ToString('yyyyMMdd.HHmmss')"
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
       - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip"""
