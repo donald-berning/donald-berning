@@ -44,5 +44,6 @@ jobs:
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..."
           $DTE = $DT - $DTB
-          $DTE = ($DTE).ToString('HH:mm:ss')
+          echo "elapsed = $DTE"
+          $DTE = ($DTE).ToString('HHmmss')
           echo "elapsed = $DTE"
