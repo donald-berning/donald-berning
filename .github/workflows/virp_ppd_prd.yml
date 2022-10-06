@@ -24,8 +24,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - run: |
-        $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
-        echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
       - id: Zip
         if: false #skips the step (or job)
         run: |
