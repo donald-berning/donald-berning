@@ -53,8 +53,9 @@ jobs:
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           $DTB = ${{needs.Preamble.outputs.DTB}}
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
-          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..."
+          echo "current=$(date +'%Y%m%d.%H%M%S')  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..."
           $DTE = $DT - $DTB
           echo "elapsed = $DTE"
           $DTE = ($DTE).ToString('yyyyMMdd.HHmmss')
           echo "elapsed = $DTE"
+          echo "now = ${{needs.Preamble.now.now}}"
