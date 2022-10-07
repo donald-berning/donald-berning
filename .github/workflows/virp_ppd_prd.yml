@@ -27,7 +27,7 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Test with environment variables
-      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}"  Now = ${{ steps.now.outputs.now}}
+      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}"
 
   Build:
     # if: false #skips the step (or job)
