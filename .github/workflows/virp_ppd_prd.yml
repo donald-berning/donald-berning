@@ -60,4 +60,3 @@ jobs:
           echo "elapsed = $DTE"
           $DTE = ($DTE).ToString('yyyyMMdd.HHmmss')
           echo "elapsed = $DTE"
-dhb221007/111030	echo "steps.date.outputs.date = 2022-10-07  Now = 20221007.150949  Nower = 10/07/2022 15:09:49.ToString('yyyyMMdd.HHmmss')"
