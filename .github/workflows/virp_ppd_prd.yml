@@ -25,7 +25,7 @@ jobs:
           echo "::set-output name=now::$DT"
       - name: Set current date as env variable
         id: nower
-        run: echo "::set-output name=nower::${{$(Get-Date).ToString('yyyyMMdd.HHmmss')}}"
+        run: echo "::set-output name=nower::${{(Get-Date).ToString('yyyyMMdd.HHmmss')}}"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
