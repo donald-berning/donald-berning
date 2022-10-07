@@ -22,12 +22,19 @@ jobs:
         run: |
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "NOW::$DT" >> $GITHUB_ENV
-      - name: Echo current date
-        run: echo "Now = $NOW"
-      - name: Set current date as env variable
-        run: echo "NOW::$(Get-Date).ToString('yyyyMMdd.HHmmss')" >> $GITHUB_ENV
-      - name: Echo current date
-        run: echo "Now = $NOW"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: Test with environment variables
+        run: echo $TAG_NAME - $RELEASE_NAME
+        env:
+          TAG_NAME: nightly-tag-${{ steps.date.outputs.date }}
+          RELEASE_NAME: nightly-release-${{ steps.date.outputs.date }}
+      - name: Test with input
+        uses: actions/hello-world-docker-action@master
+        with:
+          who-to-greet: Mona-the-Octocat-${{ steps.date.outputs.date }}
+      - run echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}"
 
   Build:
     # if: false #skips the step (or job)
