@@ -8,7 +8,9 @@ jobs:
     runs-on: windows-latest
     outputs:
       b: ${{ steps.zip.outputs.b }}
-      DTB: ${{steps.zip.outputs.DTB}}  
+      DTB: ${{steps.zip.outputs.DTB}} 
+      date: ${{steps.date.outputs.date}} 
+      now: ${{steps.now.outputs.now}}
     steps:
       - id: Zip
         run: |
@@ -26,7 +28,7 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M%S')"
-      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}"
+      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}  b = ${{ steps.zip.outputs.b   DT = ${{ steps.zip.outputs.dtb }} "
       - run: echo "$(date +'%Y%m%d.%H%M%S') one line timestamp"
 
   Build:
@@ -34,6 +36,7 @@ jobs:
     needs: Preamble
     runs-on: windows-latest
     steps:
+      - run: echo "steps.date.outputs.date = ${{ needs.Preamble.outputs.date}}  Now = ${{ needs.Preamble.outputs.now }}  b = ${{ needs.Preamble.outputs.b   DT = ${{ needs.Preamble.outputs.dtb }} "
       - run: |
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
