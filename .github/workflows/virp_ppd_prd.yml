@@ -18,11 +18,14 @@ jobs:
           echo "::set-output name=DTB::$DT"
           echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b."
       - run: echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
-
+      - name: Set current date as env variable
+        id: now
+        run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "::set-output name=now::$DT"
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
-      - name: Test with environment variables
       - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}"
 
   Build:
