@@ -27,6 +27,7 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M%S')"
       - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}"
+      - run: echo "$(date +'%Y%m%d.%H%M%S') one line timestamp"
 
   Build:
     # if: false #skips the step (or job)
