@@ -36,7 +36,7 @@ jobs:
     needs: Preamble
     runs-on: windows-latest
     steps:
-      - run: echo "steps.date.outputs.date = ${{ needs.Preamble.outputs.date}}  Now = ${{ needs.Preamble.outputs.now }}  b = ${{ needs.Preamble.outputs.b   DT = ${{ needs.Preamble.outputs.dtb }} "
+      - run: echo "steps.date.outputs.date = ${{ needs.Preamble.outputs.date}}  Now = ${{ needs.Preamble.outputs.now }}  b = ${{ needs.Preamble.outputs.b }}   DT = ${{ needs.Preamble.outputs.dtb }} "
       - run: |
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
