@@ -19,11 +19,13 @@ jobs:
           echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b."
       - run: echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
       - name: Set current date as env variable
-        run: echo "NOW::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "NOW::$DT" >> $GITHUB_ENV
       - name: Echo current date
         run: echo "Now = $NOW"
       - name: Set current date as env variable
-        run: echo "NOW::$(date +'%Y%m%dT%H%M%S')" >> $GITHUB_ENV
+        run: echo "NOW::$(Get-Date).ToString('yyyyMMdd.HHmmss')" >> $GITHUB_ENV
       - name: Echo current date
         run: echo "Now = $NOW"
 
