@@ -28,7 +28,7 @@ jobs:
       - name: Get current date
         id: date
         run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M%S')"
-      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}  b = ${{ steps.zip.outputs.b   DT = ${{ steps.zip.outputs.dtb }} "
+      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}  b = ${{ steps.zip.outputs.b }}   DT = ${{ steps.zip.outputs.dtb }} "
       - run: echo "$(date +'%Y%m%d.%H%M%S') one line timestamp"
 
   Build:
