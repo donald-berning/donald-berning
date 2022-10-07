@@ -34,7 +34,7 @@ jobs:
         uses: actions/hello-world-docker-action@master
         with:
           who-to-greet: Mona-the-Octocat-${{ steps.date.outputs.date }}
-      - run echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}"
+      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}"
 
   Build:
     # if: false #skips the step (or job)
