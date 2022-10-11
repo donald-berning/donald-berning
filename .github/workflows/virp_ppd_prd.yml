@@ -12,7 +12,7 @@ jobs:
       date: ${{steps.date.outputs.date}} 
       now: ${{steps.now.outputs.now}}
     steps:
-      - run: echo "$(date +'%Y%m%d.%H%M%S') Fortify results:  \\VAAUSWEBCRE801.aac.dva.va.gov" # \Deployment Files\fortify\" # ${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
+      - run: echo "$(date +'%Y%m%d.%H%M%S') Fortify results:  \\" # VAAUSWEBCRE801.aac.dva.va.gov" # \Deployment Files\fortify\" # ${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
       - id: Zip
         run: |
           $b = ${{ github.run_number }} + 252  # bOffset
