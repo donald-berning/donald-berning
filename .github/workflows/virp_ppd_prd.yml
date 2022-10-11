@@ -12,7 +12,8 @@ jobs:
       date: ${{steps.date.outputs.date}} 
       now: ${{steps.now.outputs.now}}
     steps:
-      - run: echo "$(date +'%Ymd.HMS') Fortify results':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\fortify\${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
+      - run: echo $(date +'%Y%m%d.%H%M%S') "Check out repository code"
+      - run: echo "$(date +'%Ymd.HMS') this form is no good 
       - run: echo "$(date +'%Y%m%d.%H%M%S') Fortify results':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\fortify\${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
       - id: Zip
         run: |
