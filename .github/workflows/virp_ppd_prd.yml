@@ -20,7 +20,7 @@ jobs:
       - id: dt
         run: echo "::set-output name=dt::$(Get-Date -Format 'yyyyMMdd.HHmmss')"
       - run: echo "${{ steps.dt.outputs.dt }} Check out repository code"
-      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"      - id: Zip
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
 
       - id: Zip
         run: |
