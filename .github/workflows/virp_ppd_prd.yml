@@ -16,6 +16,12 @@ jobs:
       - run: echo $(date +'%Y%m%d.%H%M%S') "Check out repository code"
       - run: echo "$(date +'%Ymd.HMS') this form is no good" 
       - run: echo "$(date +'%Y%m%d.%H%M%S') Fortify results':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\fortify\${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
+
+      - id: dt
+        run: echo "::set-output name=dt::$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - run: echo "${{ steps.dt.outputs.dt }} Check out repository code"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"      - id: Zip
+
       - id: Zip
         run: |
           $b = ${{ github.run_number }} + 252  # bOffset
