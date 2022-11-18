@@ -1,0 +1,32 @@
+name: test preamble jobs
+on:
+  push:
+    branches:
+      - tpre
+jobs:
+  Preamble:
+    runs-on: windows-latest
+    steps:
+      - run: whoami
+  pBuild:
+    runs-on: windows-latest
+    environment: 
+      name: Build
+    steps:
+      - run: whoami
+  pSummary:
+    runs-on: windows-latest
+    environment: 
+      name: Summary
+    steps:
+      - run: whoami
+  Build:
+    needs: [Preamble,pBuild]
+    runs-on: windows-latest
+    steps:
+      - run: whoami
+  Summary:
+    needs: [Preamble, Build, pSummary]
+    runs-on: windows-latest
+    steps:
+      - run: whoami
