@@ -30,3 +30,17 @@ jobs:
     runs-on: windows-latest
     steps:
       - run: whoami
+  Build2:
+    needs: [Preamble]
+    runs-on: windows-latest
+    environment: 
+      name: Build
+    steps:
+      - run: whoami
+  Summary2:
+    needs: [Preamble, Build]
+    runs-on: windows-latest
+    environment: 
+      name: Summary
+    steps:
+      - run: whoami
