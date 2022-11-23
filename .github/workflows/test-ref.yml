@@ -1,0 +1,80 @@
+name: Test github.ref
+on:
+  push:
+    branches:
+      - test-ref
+jobs:
+  Preamble:
+    runs-on: windows-latest
+    outputs:
+      b: ${{ steps.zip.outputs.b }}
+      DTB: ${{steps.zip.outputs.DTB}} 
+      date: ${{steps.date.outputs.date}} 
+      now: ${{steps.now.outputs.now}}
+    steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
+      - run: echo $(date +'%Y%m%d.%H%M%S') "Check out repository code"
+      - run: echo "$(date +'%Ymd.HMS') this form is no good" 
+      - run: echo "$(date +'%Y%m%d.%H%M%S') Fortify results':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\fortify\${{ needs.Build.outputs.dtb }}_${{ needs.Build.outputs.b }}.fpr"
+      - run: echo "for branch ${{ github.ref }}"
+
+      - id: dt
+        run: echo "::set-output name=dt::$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - run: echo "${{ steps.dt.outputs.dt }} Check out repository code"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
+
+      - id: Zip
+        run: |
+          $b = ${{ github.run_number }} + 252  # bOffset
+          echo "::set-output name=b::$b"
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          echo "for branch ${{ github.ref }} becomes $VERSION
+          
+          echo "::set-output name=DTB::$DT"
+          echo "Current $DT  RUN_NUMBER ${{ github.run_number }}  build number $b."
+      - run: echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
+      - name: Set current date as env variable
+        id: now
+        run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "::set-output name=now::$DT"
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d.%H%M%S')"
+      - run: echo "steps.date.outputs.date = ${{ steps.date.outputs.date}}  Now = ${{ steps.now.outputs.now }}  b = ${{ steps.zip.outputs.b }}   DT = ${{ steps.zip.outputs.dtb }} "
+      - run: echo "$(date +'%Y%m%d.%H%M%S') one line timestamp"
+
+  Build:
+    # if: false #skips the step (or job)
+    needs: Preamble
+    runs-on: windows-latest
+    steps:
+      - run: echo "steps.date.outputs.date = ${{ needs.Preamble.outputs.date}}  Now = ${{ needs.Preamble.outputs.now }}  b = ${{ needs.Preamble.outputs.b }}   DT = ${{ needs.Preamble.outputs.dtb }} "
+      - run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...    b=${{needs.Preamble.outputs.b}}..."
+      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
+      - id: Zip
+        if: false #skips the step (or job)
+        run: |
+          echo "Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
+          Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}_${{needs.Preamble.outputs.b}}.deploy.zip"
+      - run: echo "-DestinationPath ""d:\Deployment Files\VIRP\Builds\DEV\${{needs.Preamble.outputs.DTB}}-${{needs.Preamble.outputs.b}}.deploy.zip""" >> $GITHUB_STEP_SUMMARY
+  Summary:
+    needs: [Preamble, Build]
+    runs-on: windows-latest
+    steps:
+      - run: echo $GITHUB_STEP_SUMMARY
+      - run: |
+          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
+          $DTB = ${{needs.Preamble.outputs.DTB}}
+          echo "current=$DT  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..." >> $GITHUB_STEP_SUMMARY
+          echo "current=$(date +'%Y%m%d.%H%M%S')  DTB=${{needs.Preamble.outputs.DTB}}...$DTB...    b=${{needs.Preamble.outputs.b}}..."
+          $DTE = $DT - $DTB
+          echo "elapsed = $DTE"
+          $DTE = ($DTE).ToString('yyyyMMdd.HHmmss')
+          echo "elapsed = $DTE"
+          echo "now = ${{needs.Preamble.now.now}}"
