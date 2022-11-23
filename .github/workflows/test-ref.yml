@@ -30,6 +30,7 @@ jobs:
           echo "::set-output name=b::$b"
           $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
           
+          echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,'
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           echo "for branch ${{ github.ref }} becomes $VERSION"
           
