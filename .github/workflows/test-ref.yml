@@ -36,7 +36,7 @@ jobs:
 
       - id: prep_version
         run: |
-          export test_version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          set test_version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           echo ::set-output name=version::$test_version
           echo "becomes $VERSION  prep version"
           
