@@ -12,6 +12,22 @@ jobs:
       date: ${{steps.date.outputs.date}} 
       now: ${{steps.now.outputs.now}}
     steps:
+      - id: set ref branch
+        run: |
+          echo "bare sed"
+          echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,'
+          echo "write something"
+
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          echo "for branch ${{ github.ref }} becomes $VERSION"
+
+          VERSION=$$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          echo "for branch ${{ github.ref }} becomes $VERSION"
+
+          # VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          echo "for branch ${{ github.ref }} becomes $VERSION"
+          
+
       - run: whoami
       - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
       - run: echo $(date +'%Y%m%d.%H%M%S') "Check out repository code"
