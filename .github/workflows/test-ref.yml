@@ -12,7 +12,7 @@ jobs:
       date: ${{steps.date.outputs.date}} 
       now: ${{steps.now.outputs.now}}
     steps:
-      - id: set ref branch
+      - id: setRefBranch
         run: |
           echo "bare sed"
           echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,'
