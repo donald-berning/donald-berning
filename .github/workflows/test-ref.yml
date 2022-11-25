@@ -23,7 +23,7 @@ jobs:
 
           echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,'
           
-          echo $github | sed -e 's,.*/\(.*\),\1,'
+          echo $VERSION | sed -e 's,.*/\(.*\),\1,'
 
           $VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           echo "for branch ${{ github.ref }} becomes $VERSION     $(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')"
