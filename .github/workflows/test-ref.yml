@@ -33,6 +33,13 @@ jobs:
 
           # VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           echo "for branch ${{ github.ref }} becomes $VERSION"
+
+		  - name: prepare version string
+		    id: prep_version
+		      run: |
+			    export test_version=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+			    echo ::set-output name=version::$test_version
+			    echo "becomes $VERSION  prep version"
           
 
       - run: whoami
