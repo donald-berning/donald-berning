@@ -1,0 +1,10 @@
+name: "CodeQL Config for GitHub Actions"
+queries:
+  - uses: security-and-quality
+  - uses: codeql/actions-queries
+languages:
+  - language: actions
+    paths:
+      - '.github/workflows/**/*.yml' # GitHub Actions workflow files
+    paths-ignore:
+      - '.github/workflows/codeql-config.yml' # Exclude the config file

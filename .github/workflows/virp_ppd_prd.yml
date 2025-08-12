@@ -1,316 +1,981 @@
-name: VIRP Build/scan; Deploy when environment approved
+name: VIRP Build/scan/deploy
 on:
   pull_request:
     branches:
-      - master
+      - xmaster
   push:
     branches:
-      - dhb800
-      - HIM_16_profile      
-env:
-  DateTimeBuild: (Get-Date).ToString('yyyyMMdd.HHmm')
-  bOffset: 252
+      - HIM*
+      - VIRP*
+defaults:
+  run:
+    shell: pwsh
 jobs:
   Preamble:
-    runs-on: windows-latest
+    runs-on: 'web801b'
     outputs:
-      b: ${{ steps.zip.outputs.b }}
-      outDateTimeBuild: ${{steps.zip.outputs.outDateTimeBuild}}  
+      b: ${{ steps.Preamble.outputs.b }}
+      br: ${{ steps.Preamble.outputs.br }}
+      dtb: ${{ steps.Preamble.outputs.dtb }} 
+      p: ${{ steps.Preamble.outputs.p }} 
+      s: ${{ steps.Preamble.outputs.s }} 
     steps:
-      - run: echo "B= $env:b bOffset= $env:bOffset ${{ github.event_name }} DateTimeBuild= $env:DateTimeBuild  ${{ github.ref }} in ${{ github.repository }}."
-      - id: Zip
+      - id: Preamble
+        env:
+          comMsg: "${{ github.event.commits[0].message }}"
+          prTitle: ${{ github.event.pull_request.title }}
         run: |
-          $b = ${{ github.run_number }} + ${{ env.bOffset }}
-          echo "::set-output name=b::$b"
-          $DateTimeBuild = ${{ env.datetimebuild }}
-          echo "::set-output name=outDateTimeBuild::$DateTimeBuild"
-          echo " RUN_NUMBER ${{ github.run_number }} b ${{ env.b }} bOffset ${{ env.bOffset }}  build number $b."  
-          $DT= (Get-Date).ToString('yyyyMMdd.HHmmss')
-          echo "Current $DT DateTimeBuild= $env:DateTimeBuild"
+          $b=${{ github.run_number }} + 252  # bOffset
+          $branch="${{ github.ref }}"
+          $br = ($branch -split "/")[2]  # Split the branch ref and take the third part (e.g., 'main')
+          $dtb = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $commitMessage = $env:comMsg.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $fl = ($commitMessage -split '\r?\n')[0]
+          $fl = $fl.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $t = $env:prTitle.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $p = "$dtb $b ${{ github.run_number }} ${{ github.run_attempt }}".Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = "$br $fl ${{ github.event.pull_request.number }} $t ${{ github.actor }}".Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p Build                                     $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "b=$b"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "br=$br"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "dtb=$dtb"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "t=$t"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "p=$p"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "s=$s"
+
+  pVIRP:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: VIRP
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $VIRP = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p              VIRP   $VIRP       $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+      - run: echo "${{ needs.Preamble.outputs.dtb }} Version= ${{ needs.Preamble.outputs.b }} Triggered by ${{ github.event_name }} for branch ${{ github.ref }} for 'github.run_number = ' ${{ github.run_number }}."          
+  pVIRP2:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: VIRP2
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $VIRP2 = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p          VIRP2 $VIRP2            $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+  pVIRP3:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: VIRP3
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $VIRP3 = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p      VIRP3 $VIRP3                $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+  pVIRP4:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: VIRP4
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $VIRP4 = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p  VIRP4 $VIRP4                    $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+  pFortify:
+    runs-on: 'web801b'
+    environment:
+      name: Fortify
+    steps:
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+  pSQA:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: SQA
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $SQA   = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p                  SQA   $SQA    $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+  pPPD:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: PPD
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $PPD   = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p                  PPD   $PPD    $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
+  pPRD:
+    runs-on: 'web801b'
+    needs: [Preamble]
+    environment: 
+      name: PRD
+    env:
+      VIRPp: ${{ needs.Preamble.outputs.p }}
+      VIRPs: ${{ needs.Preamble.outputs.s }}
+    steps:
+      - run: |
+          $PRD   = Get-Date -Format 'yyyyMMdd.HHmmss'
+          $p = $env:VIRPp.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          $s = $env:VIRPs.Replace("'", "`'").Replace("{", "`{").Replace('"', "`"")
+          echo "$p                     PRD   $PRD $s" >> c:\DeploymentFiles\VIRP\Builds\BuildDeployLogNew.txt
 
   Build:
-    # if: false #skips the step (or job)
-    needs: Preamble
-    runs-on: windows-latest
+    runs-on: 'web801xxx'
+    needs: [Preamble]
+    # env:
+    #   GIT_TRACE: 1
+    #   GIT_CURL_VERBOSE: 1
+    #   GIT_LFS_TRACE: 1
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event for branch ${{ github.ref }} in ${{ github.repository }} for 'GITHUB.RUN_NUMBER = ' ${{ github.run_number }}."
+      - run: echo "${{ needs.Preamble.outputs.dtb }} Version= ${{ needs.Preamble.outputs.b }} Triggered by ${{ github.event_name }} for branch ${{ github.ref }} for 'github.run_number = ' ${{ github.run_number }}."
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
+      - run: whoami
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          token: ${{ secrets.SECURITY_TOKEN }}
           ssh-strict: true
           persist-credentials: true
           lfs: false
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Fetch LFS"
+      - run: whoami
+      - name: Set LFS Authorization Header (PowerShell)
+        shell: pwsh
+        env:
+          SECURITY_TOKEN: ${{ secrets.SECURITY_TOKEN }}
+        run: |
+          git config --unset-all http.https://github.ec.va.gov/.extraheader
+          $token = $env:SECURITY_TOKEN
+          $creds = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$token"))
+          git config --local http."https://github.ec.va.gov/EPMO/virp-web-site.git/info/lfs".extraheader "AUTHORIZATION: basic $creds"
       - name: Fetch LFS
         run: |
-          git lfs fetch origin head
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs fetch start"
+          git lfs fetch
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs fetch complete"
           git lfs checkout
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs checkout complete"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Build VIRP"
       - name: Build app for release to virp
-        if: false #skips the step (or job)
         run: |
           mode con: lines=32766
           $Env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
           $Env:Path += ";C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin"
           $env:path -split ";"
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clean VIRP Solution"
+          $env:b = ${{ needs.Preamble.outputs.b }}
+          MSBuild VIRP_SOLN.sln -t:"Clean" -v:minimal /p:Configuration=Prod
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Build VIRP Service"
           cd "Registries VIRP Service"
-          $env:b = ${{ github.run_number }} + ${{ env.bOffset }}
-          echo "Build number $env:b"
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime starting VIRP_SERVICE_DEV
-          MSBuild VIRP_SERVICE.csproj -v:minimal /p:DeployOnBuild=true /p:Configuration=Staging /p:PublishProfile=VIRP_SERVICE_DEV
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime starting VIRP_WEB_DEV
+          $env:b = ${{ needs.Preamble.outputs.b }}
+          MSBuild VIRP_SERVICE.csproj -v:minimal /p:DeployOnBuild=true /p:Configuration=Prod /p:PublishProfile=VIRP_SERVICE_DEV
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Build VIRP REST"
+          cd ..\"Registries VIRP REST"
+          $env:b = ${{ needs.Preamble.outputs.b }}
+          MSBuild VIRP_REST.csproj -v:minimal /p:DeployOnBuild=true /p:Configuration=Prod /p:PublishProfile=VIRP_REST_DEV
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Build VIRP Web Site"
           cd ..\"Registries VIRP Web Site"
-          MSBuild VIRP_WEB.csproj -v:minimal /p:DeployOnBuild=true /p:Configuration=Staging /p:PublishProfile=VIRP_WEB_DEV
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime starting zip
-          cd ..\"Registries VIRP Documentation\DeploymentScripts"
+          $env:b = ${{ needs.Preamble.outputs.b }}
+          MSBuild VIRP_WEB.csproj -v:minimal /p:DeployOnBuild=true /p:Configuration=Prod /p:PublishProfile=VIRP_WEB_DEV
+
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Deployment folder':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip"
       - id: Zip
-        if: false #skips the step (or job)
         run: |
-          Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip"
-      - run: echo Deployment folder:  \\VAAUSWEBCRE801.aac.dva.va.gov\d$\DeploymentFiles\VIRP\Builds\DEV\$DateTimeBuild.deploy.zip  for build ${{ github.run_number }}
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Zip deployment package  \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip"
+          Compress-Archive -Path c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_SERVICE, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_REST, c:\DeploymentFiles\VIRP\Builds\DEV\VIRP_WEB, 'c:\DeploymentFiles\VIRP\Builds\DEV\$$ReadMe' -DestinationPath "d:\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Deployment folder':' \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" 
 
   Fortify:
-    runs-on: windows-latest
-    needs: [Build]
-    environment: 
-      name: Fortify
+    runs-on: 'web801'
+    # dhb230519/142830	rules updated to <Version>2023.1.0.0008</Version>
+    needs: [Preamble, pFortify, Build]
     steps:
-      - name: Fortify scan
+      - run: echo "${{ needs.Preamble.outputs.dtb }} Version= ${{ needs.Preamble.outputs.b }} Triggered by ${{ github.event_name }} for branch ${{ github.ref }} for 'github.run_number = ' ${{ github.run_number }}."
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Check out repository code"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SECURITY_TOKEN }}
+          ssh-strict: true
+          persist-credentials: true
+          lfs: false
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Fetch LFS"
+      - name: Set LFS Authorization Header (PowerShell)
+        shell: pwsh
+        env:
+          SECURITY_TOKEN: ${{ secrets.SECURITY_TOKEN }}
         run: |
+          git config --unset-all http.https://github.ec.va.gov/.extraheader
+          $token = $env:SECURITY_TOKEN
+          $creds = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$token"))
+          git config --local http."https://github.ec.va.gov/EPMO/virp-web-site.git/info/lfs".extraheader "AUTHORIZATION: basic $creds"
+      - name: Fetch LFS
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs fetch start"
+          git lfs fetch
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs fetch complete"
+          git lfs checkout
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  lfs checkout complete"
+          git lfs ls-files
+
+      - name: Run Fortify with custom env
+        env:
+          USERPROFILE: D:\Deployment Files\fortify\software\fortify_home
+          APPDATA: D:\Deployment Files\fortify\software\fortify_home\AppData\Roaming
+          TEMP: D:\Deployment Files\fortify\software\fortify_home\Temp
+        shell: pwsh
+        run: |
+          dir "$env:USERPROFILE\.fortify\builds\VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}" -ErrorAction SilentlyContinue        
+          Write-Output "USERPROFILE: $env:USERPROFILE"
+          Write-Output "APPDATA: $env:APPDATA"
+          Write-Output "TEMP: $env:TEMP"
+          Write-Output "TMP: $env:TMP"
+          Write-Host "Shell: $SHELL"
+          Write-Host "Pwsh Version: $($PSVersionTable.PSVersion)"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Verify solution file"
+          dir VIRP_SOLN.sln || exit 1
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Verify tools"
+          sourceanalyzer -version
+          where devenv
+          where msbuild
           mode con: lines=32766
           $Env:Path += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin"
           $Env:Path += ";C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin"
           $env:path -split ";"
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime start Fortify clean
-          sourceanalyzer -b VIRP_SOLN -clean
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime start Fortify devenv
-          sourceanalyzer -b VIRP_SOLN -Xmx8G -Xss800M devenv "VIRP_SOLN.sln" /Rebuild Debug
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime start Fortify analyze
-          sourceanalyzer -b VIRP_SOLN -Xmx8G -Xss800M -scan -f "VIRP_SOLN.fpr"
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          echo $DateTime start Fortify copy
+
+          set FORTIFY_USER_HOME=D:\Deployment Files\fortify\software\fortify_home
+
+          # echo "com.fortify.sca.debug=true" > fortify.properties
+          # echo "com.fortify.sca.verbose=true" >> fortify.properties
+          # echo "com.fortify.sca.logfile=D:\Deployment Files\fortify\software\fortify-detailed.log" >> fortify.properties
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Fortify clean"
+          sourceanalyzer -b VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }} -clean
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Fortify devenv"
+          sourceanalyzer -b VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }} -Xmx12G -Xss8M devenv "VIRP_SOLN.sln" /Rebuild Debug
+          # sourceanalyzer -b VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }} -debug -logfile "D:\Deployment Files\fortify\software\translation.log" -verbose -Xmx8G -Xss8M devenv "VIRP_SOLN.sln" /Rebuild Debug
+
+          dir "$env:USERPROFILE\.fortify\builds\VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}" -ErrorAction SilentlyContinue
+
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Fortify analyze"
+          sourceanalyzer -b VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }} -Xmx12G -Xss8M -scan -f "VIRP_SOLN.fpr"
+          # sourceanalyzer -b VIRP_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }} -Xmx12G -Xss8M -debug -verbose -logfile "D:\Deployment Files\fortify\software\scan.log" -scan -f "VIRP_SOLN.fpr"
+
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss') Archive Fortify \\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\fortify\2.6.36.${{ needs.Preamble.outputs.b }}_${{ needs.Preamble.outputs.dtb }}__2025.2.0_25.2.0_${{ needs.Preamble.outputs.br }}.fpr"
       - name: Archive the .fpr file
-      - run: Copy-Item -path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\${{needs.Build.outputs.outDateTimeBuild}}.fpr"
-      - run: echo "-path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\${{needs.Build.outputs.outDateTimeBuild}}.fpr""
+        run: Copy-Item -path C:\actions-runner\_work\virp-web-site\virp-web-site\VIRP_SOLN.fpr "D:\Deployment Files\fortify\2.6.36.${{ needs.Preamble.outputs.b }}_${{ needs.Preamble.outputs.dtb }}__2025.2.0_25.2.0_${{ needs.Preamble.outputs.br }}.fpr"
+
 
   Backup800:
-    runs-on: windows-latest
+    runs-on: 'web800'
+    needs: [Preamble, pVIRP]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE800\$DateTime.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_REST, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE800\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
   Backup801:
-    runs-on: windows-latest
+    runs-on: 'web801b'
+    needs: [Preamble, pVIRP]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE801\$DateTime.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_REST, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE801\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
   Backup800-2:
-    runs-on: windows-latest
+    runs-on: 'web800'
+    needs: [Preamble, pVIRP2]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE2, d:\inetpub\wwwroot\VIRP_WEB2 -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE800-2\$DateTime.2.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE2, d:\inetpub\wwwroot\VIRP_REST2, d:\inetpub\wwwroot\VIRP_WEB2 -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE800-2\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.2.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+  Backup801-3:
+    runs-on: 'web801b'
+    needs: [Preamble, pVIRP3]
+    steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP3_SERVICE, d:\inetpub\wwwroot\VIRP3_REST, d:\inetpub\wwwroot\VIRP3_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE801-3\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.3.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+  Backup801-4:
+    runs-on: 'web801b'
+    needs: [Preamble, pVIRP4]
+    steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP4_SERVICE, d:\inetpub\wwwroot\VIRP4_REST, d:\inetpub\wwwroot\VIRP4_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE801-4\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.4.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')"
 
   Deploy_Dev800:
-    runs-on: windows-latest
-    needs: [Build, Backup800]
+    runs-on: 'web800'
+    needs: [Preamble, Build, Backup800]
     steps:
-      - name: Clear the running service and web-site
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp
+          Stop-WebAppPool virp
+          Stop-WebSite virp_service
+          Stop-WebAppPool virp_service
+          Stop-WebSite virp_REST
+          Stop-WebAppPool virp_REST
+                    echo "VIRP stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB\* -Recurse -Force -ErrorAction Continue
-      - name: Deploy to Dev
+      - name: Deploy to Dev web800
         run: |
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to Dev web800 - Expand Archive"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.web800.config' d:\inetpub\wwwroot\VIRP_SERVICE\Config\appSettings.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.Serviceweb800.config' d:\inetpub\wwwroot\VIRP_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.restweb800.config' d:\inetpub\wwwroot\VIRP_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.RESTweb800.config' d:\inetpub\wwwroot\VIRP_REST\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.web800.config' d:\inetpub\wwwroot\VIRP_WEB\Web.config
+          Remove-Item 'd:\inetpub\wwwroot\$$ReadMe' -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service
+          Start-WebSite virp_service
+          Start-WebAppPool virp_REST
+          Start-WebSite virp_REST
+          Start-WebAppPool virp
+          Start-WebSite virp
   Deploy_Dev801:
-    runs-on: windows-latest
-    needs: [Build, Backup801]
+    runs-on: 'web801b'
+    needs: [Preamble, Build, Backup801]
     steps:
-      - name: Clear the running service and web-site
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp
+          Stop-WebAppPool virp
+          Stop-WebSite virp_service
+          Stop-WebAppPool virp_service
+          Stop-WebSite virp_REST
+          Stop-WebAppPool virp_REST
+                    echo "VIRP stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB\* -Recurse -Force -ErrorAction Continue
-      - name: Deploy to Dev
+      - name: Deploy to Dev web801
         run: |
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to Dev - Expand Archive"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.web800.config' d:\inetpub\wwwroot\VIRP_SERVICE\Config\appSettings.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.Serviceweb800.config' d:\inetpub\wwwroot\VIRP_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.restweb800.config' d:\inetpub\wwwroot\VIRP_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.RESTweb800.config' d:\inetpub\wwwroot\VIRP_REST\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.web801.config' d:\inetpub\wwwroot\VIRP_WEB\Web.config
+          Remove-Item 'd:\inetpub\wwwroot\$$ReadMe' -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service
+          Start-WebSite virp_service
+          Start-WebAppPool virp_REST
+          Start-WebSite virp_REST
+          Start-WebAppPool virp
+          Start-WebSite virp
   Deploy_Dev800-2:
-    if: false #skips the step (or job)
-    runs-on: windows-latest
-    needs: [Build, Backup800-2]
+    runs-on: 'web800'
+    needs: [Preamble, Build, Backup800-2]
     steps:
-      - name: Clear the running service and web-site
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service2
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp2
+          Stop-WebAppPool virp2
+          Stop-WebSite virp_service2
+          Stop-WebAppPool virp_service2
+          Stop-WebSite virp_REST2
+          Stop-WebAppPool virp_REST2
+                    echo "VIRP2 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP2 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE2\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST2\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB2\* -Recurse -Force -ErrorAction Continue
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work2
-      - name: Deploy to Dev2 web501
+      - name: Deploy to Dev2 web800-2
         run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to Dev web800-2 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work2
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-2"
           Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP_SERVICE2 -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-2"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_REST\* d:\inetpub\wwwroot\VIRP_REST2 -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-2"
           Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_WEB\* d:\inetpub\wwwroot\VIRP_WEB2 -Force
-          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\appSettings.web800.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Config\appSettings.config
-          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.Serviceweb800.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Web.config
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\appSettings.web800.2.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.Serviceweb800.2.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\appSettings.restweb800.2.config' d:\inetpub\wwwroot\VIRP_REST2\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.restweb800.2.config' d:\inetpub\wwwroot\VIRP_REST2\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.web800.2.config' d:\inetpub\wwwroot\VIRP_WEB2\Web.config
-          Remove-Item d:\inetpub\wwwroot\work2 -Recurse
-
-
+          Remove-Item d:\inetpub\wwwroot\work2 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service2
+          Start-WebSite virp_service2
+          Start-WebAppPool virp_REST2
+          Start-WebSite virp_REST2
+          Start-WebAppPool virp2
+          Start-WebSite virp2
+  Deploy_Dev801-3:
+    runs-on: 'web801b'
+    needs: [Preamble, Build, Backup801-3]
+    steps:
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp3_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp3
+          Stop-WebAppPool virp3
+          Stop-WebSite virp3_service
+          Stop-WebAppPool virp3_service
+          Stop-WebSite virp3_REST
+          Stop-WebAppPool virp3_REST
+                    echo "VIRP3 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP3 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item d:\inetpub\wwwroot\VIRP3_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP3_REST\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP3_WEB\* -Recurse -Force -ErrorAction Continue
+      - name: Deploy to Dev3 web801-3
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to Dev web801-3 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work3
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP3_SERVICE -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_REST\* d:\inetpub\wwwroot\VIRP3_REST -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_WEB\* d:\inetpub\wwwroot\VIRP3_WEB -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\appSettings.web801.3.config' d:\inetpub\wwwroot\VIRP3_SERVICE\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.Serviceweb801.3.config' d:\inetpub\wwwroot\VIRP3_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\appSettings.restweb801.3.config' d:\inetpub\wwwroot\VIRP3_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.RESTweb801.3.config' d:\inetpub\wwwroot\VIRP3_REST\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.web801.3.config' d:\inetpub\wwwroot\VIRP3_WEB\Web.config
+          Remove-Item d:\inetpub\wwwroot\work3 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp3_service
+          Start-WebSite virp3_service
+          Start-WebAppPool virp3_REST
+          Start-WebSite virp3_REST
+          Start-WebAppPool virp3
+          Start-WebSite virp3
+  Deploy_Dev801-4:
+    runs-on: 'web801b'
+    needs: [Preamble, Build, Backup801-4]
+    steps:
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp4_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp4
+          Stop-WebAppPool virp4
+          Stop-WebSite virp4_service
+          Stop-WebAppPool virp4_service
+          Stop-WebSite virp4_REST
+          Stop-WebAppPool virp4_REST
+                    echo "VIRP4 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP4 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item d:\inetpub\wwwroot\VIRP4_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP4_REST\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP4_WEB\* -Recurse -Force -ErrorAction Continue
+      - name: Deploy to Dev4 web801-4
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to Dev web801-4 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work4
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP4_SERVICE -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_REST\* d:\inetpub\wwwroot\VIRP4_REST -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_WEB\* d:\inetpub\wwwroot\VIRP4_WEB -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\appSettings.web801.4.config' d:\inetpub\wwwroot\VIRP4_SERVICE\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.Serviceweb801.4.config' d:\inetpub\wwwroot\VIRP4_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\appSettings.restweb801.4.config' d:\inetpub\wwwroot\VIRP4_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.RESTweb801.4.config' d:\inetpub\wwwroot\VIRP4_REST\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.web801.4.config' d:\inetpub\wwwroot\VIRP4_WEB\Web.config
+          Remove-Item d:\inetpub\wwwroot\work4 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp4_service
+          Start-WebSite virp4_service
+          Start-WebAppPool virp4_REST
+          Start-WebSite virp4_REST
+          Start-WebAppPool virp4
+          Start-WebSite virp4
 
   Backup500:
     runs-on: 'web500'
-    # if: github.event_name == 'pull_request'
-    environment:
-      name: SQA
+    needs: [Preamble, pVIRP , pSQA]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE500\$DateTime.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_REST, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE500\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
   Backup501:
     runs-on: 'web501'
-    # if: github.event_name == 'pull_request'
-    environment:
-      name: SQA
+    needs: [Preamble, pVIRP, pSQA]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE501\$DateTime.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE, d:\inetpub\wwwroot\VIRP_REST, d:\inetpub\wwwroot\VIRP_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE501\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
   Backup500-2:
-    # if: false #skips the step (or job)
     runs-on: 'web500'
-    # if: github.event_name == 'pull_request'
-    environment:
-      name: SQA2
+    needs: [Preamble, pVIRP2, pSQA]
     steps:
-      - name: Backup the the running service and web-site
-        run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE2, d:\inetpub\wwwroot\VIRP_WEB2 -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE500\$DateTime.2.zip"
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP_SERVICE2, d:\inetpub\wwwroot\VIRP_REST2, d:\inetpub\wwwroot\VIRP_WEB2 -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE500-2\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.2.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+  Backup501-3:
+    runs-on: 'web501'
+    needs: [Preamble, pVIRP3, pSQA]
+    steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP3_SERVICE, d:\inetpub\wwwroot\VIRP3_REST, d:\inetpub\wwwroot\VIRP3_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE501-3\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.3.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+  Backup501-4:
+    runs-on: 'web501'
+    needs: [Preamble, pVIRP4, pSQA]
+    steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
+      - name: Backup the the running service, rest, and web-site
+        run: Compress-Archive -Path d:\inetpub\wwwroot\VIRP4_SERVICE, d:\inetpub\wwwroot\VIRP4_REST, d:\inetpub\wwwroot\VIRP4_WEB -DestinationPath "d:\Deployment Files\Backup\inetpub\VAAUSWEBCRE501-4\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.4.zip"
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')" 
 
 
   Deploy_SQA500:
     runs-on: 'web500'
-    needs: [Build, Backup500]
-    # if: github.event_name == 'pull_request'
-    environment:
-      name: SQAd
+    needs: [Preamble, Build, Backup500]
     steps:
-      - name: Clear the running service and web-site
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp
+          Stop-WebAppPool virp
+          Stop-WebSite virp_service
+          Stop-WebAppPool virp_service
+          Stop-WebSite virp_REST
+          Stop-WebAppPool virp_REST
+                    echo "VIRP stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB\* -Recurse -Force -ErrorAction Continue
       - name: Deploy to SQA web500
         run: |
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to SQA web500 - Expand Archive"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.web500.config' d:\inetpub\wwwroot\VIRP_SERVICE\Config\appSettings.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.Serviceweb500.config' d:\inetpub\wwwroot\VIRP_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.restweb500.config' d:\inetpub\wwwroot\VIRP_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.RESTweb500.config' d:\inetpub\wwwroot\VIRP_REST\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.web500.config' d:\inetpub\wwwroot\VIRP_WEB\Web.config
-  Deploy_SQA501:
-    # if: false #skips the step (or job)
-    runs-on: 'web501'
-    needs: [Build, Backup501]
-    # if: github.event_name == 'pull_request'
-    environment:
-      name: SQAd
-    steps:
-      - name: Clear the running service and web-site
+          Remove-Item 'd:\inetpub\wwwroot\$$ReadMe' -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service
+          Start-WebSite virp_service
+          Start-WebAppPool virp_REST
+          Start-WebSite virp_REST
+          Start-WebAppPool virp
+          Start-WebSite virp
+  Deploy_SQA501:
+    runs-on: 'web501'
+    needs: [Preamble, Build, Backup501]
+    steps:
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp
+          Stop-WebAppPool virp
+          Stop-WebSite virp_service
+          Stop-WebAppPool virp_service
+          Stop-WebSite virp_REST
+          Stop-WebAppPool virp_REST
+                    echo "VIRP stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB\* -Recurse -Force -ErrorAction Continue
       - name: Deploy to SQA web501
         run: |
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to SQA web501 - Expand Archive"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\inetpub\wwwroot"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.web500.config' d:\inetpub\wwwroot\VIRP_SERVICE\Config\appSettings.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.Serviceweb500.config' d:\inetpub\wwwroot\VIRP_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\appSettings.restweb500.config' d:\inetpub\wwwroot\VIRP_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.RESTweb500.config' d:\inetpub\wwwroot\VIRP_REST\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\$$ReadMe\Web.web501.config' d:\inetpub\wwwroot\VIRP_WEB\Web.config
-  Deploy_SQA-2:
-    # if: false #skips the step (or job)
+          Remove-Item 'd:\inetpub\wwwroot\$$ReadMe' -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service
+          Start-WebSite virp_service
+          Start-WebAppPool virp_REST
+          Start-WebSite virp_REST
+          Start-WebAppPool virp
+          Start-WebSite virp
+  Deploy_SQA500-2:
     runs-on: 'web500'
-    # if: github.event_name == 'pull_request'
-    needs: [Build, Backup500-2]
-    environment:
-      name: SQA2d
+    needs: [Preamble, Build, Backup500-2]
     steps:
-      - name: Clear the running service and web-site
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
         run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp_service2
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp2
+          Stop-WebAppPool virp2
+          Stop-WebSite virp_service2
+          Stop-WebAppPool virp_service2
+          Stop-WebSite virp_REST2
+          Stop-WebAppPool virp_REST2
+                    echo "VIRP2 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP2 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
           Remove-Item d:\inetpub\wwwroot\VIRP_SERVICE2\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP_REST2\* -Recurse -Force -ErrorAction Continue
           Remove-Item d:\inetpub\wwwroot\VIRP_WEB2\* -Recurse -Force -ErrorAction Continue
-      - name: Deploy to SQA2 web501
+      - name: Deploy to SQA2 web500-2
         run: |
-          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work2
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to SQA2 web500-2 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work2
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-2"
           Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP_SERVICE2 -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-2"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_REST\* d:\inetpub\wwwroot\VIRP_REST2 -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-2"
           Copy-Item -Recurse -path d:\inetpub\wwwroot\work2\VIRP_WEB\* d:\inetpub\wwwroot\VIRP_WEB2 -Force
-          Remove-Item d:\inetpub\wwwroot\work2 -Recurse
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
           Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\appSettings.web500.2.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Config\appSettings.config
           Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.Serviceweb500.2.config' d:\inetpub\wwwroot\VIRP_SERVICE2\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\appSettings.restweb500.2.config' d:\inetpub\wwwroot\VIRP_REST2\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.restweb500.2.config' d:\inetpub\wwwroot\VIRP_REST2\Web.config
           Copy-Item -path 'd:\inetpub\wwwroot\work2\$$ReadMe\Web.web500.2.config' d:\inetpub\wwwroot\VIRP_WEB2\Web.config
-
+          Remove-Item d:\inetpub\wwwroot\work2 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp_service2
+          Start-WebSite virp_service2
+          Start-WebAppPool virp_REST2
+          Start-WebSite virp_REST2
+          Start-WebAppPool virp2
+          Start-WebSite virp2
+  Deploy_SQA501-3:
+    runs-on: 'web501'
+    needs: [Preamble, Build, Backup501-3]
+    steps:
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp3_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp3
+          Stop-WebAppPool virp3
+          Stop-WebSite virp3_service
+          Stop-WebAppPool virp3_service
+          Stop-WebSite virp3_REST
+          Stop-WebAppPool virp3_REST
+                    echo "VIRP3 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP3 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item d:\inetpub\wwwroot\VIRP3_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP3_REST\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP3_WEB\* -Recurse -Force -ErrorAction Continue
+      - name: Deploy to SQA3 web501-3
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to SQA3 web501-3 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work3
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP3_SERVICE -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_REST\* d:\inetpub\wwwroot\VIRP3_REST -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-3"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work3\VIRP_WEB\* d:\inetpub\wwwroot\VIRP3_WEB -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\appSettings.web501.3.config' d:\inetpub\wwwroot\VIRP3_SERVICE\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.Serviceweb501.3.config' d:\inetpub\wwwroot\VIRP3_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\appSettings.restweb501.3.config' d:\inetpub\wwwroot\VIRP3_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.RESTweb501.3.config' d:\inetpub\wwwroot\VIRP3_REST\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work3\$$ReadMe\Web.web501.3.config' d:\inetpub\wwwroot\VIRP3_WEB\Web.config
+          Remove-Item d:\inetpub\wwwroot\work3 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp3_service
+          Start-WebSite virp3_service
+          Start-WebAppPool virp3_REST
+          Start-WebSite virp3_REST
+          Start-WebAppPool virp3
+          Start-WebSite virp3
+  Deploy_SQA501-4:
+    runs-on: 'web501'
+    needs: [Preamble, Build, Backup501-4]
+    steps:
+      - run: whoami
+      - name: Shutdown service, REST and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+                $status = Get-WebAppPoolState -name virp4_service
+                if ($status.Value -ne "Stopped") {
+          Stop-WebSite virp4
+          Stop-WebAppPool virp4
+          Stop-WebSite virp4_service
+          Stop-WebAppPool virp4_service
+          Stop-WebSite virp4_REST
+          Stop-WebAppPool virp4_REST
+                    echo "VIRP4 stopped"
+                    $backupSuccess = $true;
+                }
+                else {
+                       echo "VIRP4 already stopped"
+                    }
+      - name: Clear the running service, rest, and web-site
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item d:\inetpub\wwwroot\VIRP4_SERVICE\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP4_REST\* -Recurse -Force -ErrorAction Continue
+          Remove-Item d:\inetpub\wwwroot\VIRP4_WEB\* -Recurse -Force -ErrorAction Continue
+      - name: Deploy to SQA4 web501-4
+        run: |
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Deploy to SQA4 web501-4 - Expand Archive to work"
+          Expand-Archive -Force -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath d:\inetpub\wwwroot\work4
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Service-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_SERVICE\* d:\inetpub\wwwroot\VIRP4_SERVICE -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to REST-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_REST\* d:\inetpub\wwwroot\VIRP4_REST -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Copy from work to Web-site-4"
+          Copy-Item -Recurse -path d:\inetpub\wwwroot\work4\VIRP_WEB\* d:\inetpub\wwwroot\VIRP4_WEB -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\appSettings.web501.4.config' d:\inetpub\wwwroot\VIRP4_SERVICE\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.Serviceweb501.4.config' d:\inetpub\wwwroot\VIRP4_SERVICE\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\appSettings.restweb501.4.config' d:\inetpub\wwwroot\VIRP4_REST\Config\appSettings.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.RESTweb501.4.config' d:\inetpub\wwwroot\VIRP4_REST\Web.config
+          Copy-Item -path 'd:\inetpub\wwwroot\work4\$$ReadMe\Web.web501.4.config' d:\inetpub\wwwroot\VIRP4_WEB\Web.config
+          Remove-Item d:\inetpub\wwwroot\work4 -Recurse -Force -ErrorAction Continue
+      - name: Start service, REST, and web-site (and pools)
+        run: |
+          Import-Module WebAdministration
+          Start-WebAppPool virp4_service
+          Start-WebSite virp4_service
+          Start-WebAppPool virp4_REST
+          Start-WebSite virp4_REST
+          Start-WebAppPool virp4
+          Start-WebSite virp4
 
   Stage_PPD:
-    runs-on: windows-latest
-    if: github.event_name == 'pull_request'
-    needs: [Build] # , Fortify, Deploy_SQA500]
-    environment:
-      name: PPD
+    runs-on: 'web500'
+    if: github.event_name == 'push'
+    needs: [Preamble, Build, pPPD] 
     steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Backup the previous deployment"
       - name: Backup the the previous deployment
+        run: Compress-Archive -Path "d:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400", "d:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401" -DestinationPath "d:\Deployment Files\VIRP\PPD\Application\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - name: Clear the staging service, REST, and web-site
         run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\DeploymentFiles\VIRP\Builds\PPD\WEB40, d:\DeploymentFiles\VIRP\Builds\PPD\WEB41 -DestinationPath "d:\DeploymentFiles\VIRP\Builds\PPD\$DateTime.zip"
-          echo Backup:  d:\Deployment Files\VIRP\Builds\PPD\$DateTime.zip  for build ${{ github.run_number }}
-      - name: Clear the staging service and web-site
-        run: |
-          Remove-Item d:\DeploymentFiles\VIRP\Builds\PPD\WEB40\* -Recurse -Force -ErrorAction Continue
-          Remove-Item d:\DeploymentFiles\VIRP\Builds\PPD\WEB41\* -Recurse -Force -ErrorAction Continue
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item "d:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\*" -Recurse -Force -ErrorAction Continue
+          Remove-Item "d:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\*" -Recurse -Force -ErrorAction Continue
       - name: Stage for PPD
         run: |
-          Expand-Archive -Path "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\DeploymentFiles\VIRP\Builds\PPD\WEB40"
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB40\$$ReadMe\appSettings.web40.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB40\VIRP_SERVICE\Config\appSettings.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB40\$$ReadMe\Web.Serviceweb40.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB40\VIRP_SERVICE\Web.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB40\$$ReadMe\Web.web40.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB40\VIRP_WEB\Web.config
-          Copy-Item -Recurse -path d:\DeploymentFiles\VIRP\Builds\PPD\WEB40\* d:\DeploymentFiles\VIRP\Builds\PPD\WEB41 -Force
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB41\$$ReadMe\appSettings.web40.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB41\VIRP_SERVICE\Config\appSettings.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB41\$$ReadMe\Web.Serviceweb40.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB41\VIRP_SERVICE\Web.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PPD\WEB41\$$ReadMe\Web.web41.config' d:\DeploymentFiles\VIRP\Builds\PPD\WEB41\VIRP_WEB\Web.config
-      - run: echo "🍏 This job's status is ${{ job.status }}.  Deploy"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Stage to PPD VAAUSWEBCRE400 - Expand Archive"
+          Expand-Archive -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\$$ReadMe\appSettings.web40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\VIRP_SERVICE\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\$$ReadMe\Web.Serviceweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\VIRP_SERVICE\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\$$ReadMe\appSettings.restweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\VIRP_REST\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\$$ReadMe\Web.RESTweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\VIRP_REST\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\$$ReadMe\Web.web40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\VIRP_WEB\Web.config'
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Stage to PPD VAAUSWEBCRE401 - Expand Archive"
+          Copy-Item -Recurse -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE400\*' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401' -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe\appSettings.web40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\VIRP_SERVICE\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe\Web.Serviceweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\VIRP_SERVICE\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe\appSettings.restweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\VIRP_REST\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe\Web.RESTweb40.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\VIRP_REST\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe\Web.web41.config' 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\VIRP_WEB\Web.config'
+          Remove-Item 'd:\Deployment Files\VIRP\PPD\Application\VAAUSWEBCRE401\$$ReadMe' -Recurse -Force -ErrorAction Continue
   Stage_PRD:
-    runs-on: windows-latest
-    # if: github.event_name == 'pull_request'
-    needs: [Build, Stage_PPD]
-    environment:
-      name: PRD
+    runs-on: 'web500'
+    if: github.event_name == 'push'
+    needs: [Preamble, Build, Stage_PPD, pPRD]
     steps:
+      - run: whoami
+      - run: echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Backup the previous deployment"
       - name: Backup the the previous deployment
+        run: Compress-Archive -Path "d:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200", "d:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201" -DestinationPath "d:\Deployment Files\VIRP\PRD\Application\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.zip"
+      - name: Clear the staging service, REST, and web-site
         run: |
-          $DateTime = (Get-Date).ToString('yyyyMMdd.HHmm')
-          Compress-Archive -Path d:\DeploymentFiles\VIRP\Builds\PRD\WEB20, d:\DeploymentFiles\VIRP\Builds\PRD\WEB21 -DestinationPath "d:\DeploymentFiles\VIRP\Builds\PRD\$DateTime.zip"
-          echo Backup:  d:\Deployment Files\VIRP\Builds\PRD\$DateTime.zip  for build ${{ github.run_number }}
-      - name: Clear the staging service and web-site
-        run: |
-          Remove-Item d:\DeploymentFiles\VIRP\Builds\PRD\WEB20\* -Recurse
-          Remove-Item d:\DeploymentFiles\VIRP\Builds\PRD\WEB21\* -Recurse
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Clear running service, rest, and web-site"
+          Remove-Item 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\*' -Recurse -Force -ErrorAction Continue
+          Remove-Item 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\*' -Recurse -Force -ErrorAction Continue
       - name: Stage for PRD
         run: |
-          Expand-Archive -Path "d:\Deployment Files\VIRP\Builds\DEV\${{needs.Build.outputs.outDateTimeBuild}}.deploy.zip" -DestinationPath "d:\DeploymentFiles\VIRP\Builds\PRD\WEB20"
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB20\$$ReadMe\appSettings.WEB20.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB20\VIRP_SERVICE\Config\appSettings.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB20\$$ReadMe\Web.ServiceWEB20.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB20\VIRP_SERVICE\Web.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB20\$$ReadMe\Web.WEB20.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB20\VIRP_WEB\Web.config
-          Copy-Item -Recurse -path d:\DeploymentFiles\VIRP\Builds\PRD\WEB20\* d:\DeploymentFiles\VIRP\Builds\PRD\WEB21 -Force
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB21\$$ReadMe\appSettings.WEB20.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB21\VIRP_SERVICE\Config\appSettings.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB21\$$ReadMe\Web.ServiceWEB20.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB21\VIRP_SERVICE\Web.config
-          Copy-Item -path 'd:\DeploymentFiles\VIRP\Builds\PRD\WEB21\$$ReadMe\Web.WEB21.config' d:\DeploymentFiles\VIRP\Builds\PRD\WEB21\VIRP_WEB\Web.config
-      - run: echo "🍏 This job's status is ${{ job.status }}.  Deploy"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Stage to PRD VAAUSWEBCRE200 - Expand Archive"
+          Expand-Archive -Path "\\VAAUSWEBCRE801.aac.dva.va.gov\Deployment Files\VIRP\Builds\DEV\${{ needs.Preamble.outputs.dtb }}_${{ needs.Preamble.outputs.br }}_${{ needs.Preamble.outputs.b }}.deploy.zip" -DestinationPath "d:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200"
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\$$ReadMe\appSettings.WEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\VIRP_SERVICE\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\$$ReadMe\Web.ServiceWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\VIRP_SERVICE\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\$$ReadMe\appSettings.restWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\VIRP_REST\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\$$ReadMe\Web.RESTWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\VIRP_REST\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\$$ReadMe\Web.WEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\VIRP_WEB\Web.config'
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Stage to PPD VAAUSWEBCRE201 - Expand Archive"
+          Copy-Item -Recurse -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE200\*' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201' -Force
+          echo "$(Get-Date -Format 'yyyyMMdd.HHmmss')  Differentiate configs"
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe\appSettings.WEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\VIRP_SERVICE\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe\Web.ServiceWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\VIRP_SERVICE\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe\appSettings.restWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\VIRP_REST\Config\appSettings.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe\Web.RESTWEB20.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\VIRP_REST\Web.config'
+          Copy-Item -path 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe\Web.WEB21.config' 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\VIRP_WEB\Web.config'
+          Remove-Item 'd:\Deployment Files\VIRP\PRD\Application\VAAUSWEBCRE201\$$ReadMe' -Recurse -Force -ErrorAction Continue
