@@ -1,4 +1,8 @@
 name: VIRP Build/scan/deploy
+permissions:
+  actions: read
+  contents: read
+  security-events: write
 on:
   pull_request:
     branches:
